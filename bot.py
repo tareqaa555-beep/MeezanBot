@@ -14,7 +14,7 @@ format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 level=logging.INFO,
 )
 
-TOKEN =8578143859:AAFZAqkgGdFgLBSmSZAGQJx0Hv50TeTn2ZM
+TOKEN =8578143859:8578143859:AAH0frQQvhuGr3z5qkwJL4eUsQk7DxxOq5s
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 await update.message.reply_text(
