@@ -1,5 +1,6 @@
 import os
 import logging
+import asyncio
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -20,8 +21,7 @@ TOKEN = os.getenv("BOT_TOKEN")
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "👋 أهلاً بك في ميزان.\n\n"
-        "أنا مساعدك الذكي لمقارنة الأسعار والعثور على أفضل العروض.\n\n"
-        "اكتب اسم أي منتج وسأساعدك في العثور على أفضل خيار."
+        "أنا مساعدك الذكي لمقارنة الأسعار والعثور على أفضل العروض."
     )
 
 
@@ -34,7 +34,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 
-def main():
+async def main():
     if not TOKEN:
         raise ValueError("BOT_TOKEN environment variable not found")
 
@@ -45,8 +45,13 @@ def main():
 
     print("MeezanBot Started...")
 
-    app.run_polling()
+    await app.initialize()
+    await app.start()
+    await app.updater.start_polling()
+
+    while True:
+        await asyncio.sleep(3600)
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
