@@ -14,7 +14,7 @@ format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 level=logging.INFO,
 )
 
-TOKEN =8578143859:AAFZAqkgGdFgLBSmSZAGQJx0Hv50TeTn2ZM
+TOKEN = os.getenv("BOT_TOKEN")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 await update.message.reply_text(
