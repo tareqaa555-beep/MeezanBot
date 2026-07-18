@@ -1,5 +1,6 @@
 import os
 import logging
+
 from telegram import Update
 from telegram.ext import (
     Application,
@@ -9,6 +10,8 @@ from telegram.ext import (
     filters,
 )
 
+from openai import OpenAI
+
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO,
@@ -16,22 +19,48 @@ logging.basicConfig(
 
 TOKEN = os.getenv("BOT_TOKEN")
 
+client = OpenAI(
+    api_key=os.getenv("FREEMODEL_API_KEY"),
+    base_url=os.getenv("FREEMODEL_BASE_URL"),
+)
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "👋 أهلاً بك في ميزان.\n\n"
         "أنا مساعدك الذكي لمقارنة الأسعار والعثور على أفضل العروض.\n\n"
-        "اكتب اسم أي منتج وسأساعدك في العثور على أفضل خيار."
+        "اكتب اسم أي منتج وسأساعدك."
     )
 
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
 
-    await update.message.reply_text(
-        f"🔍 استلمت طلبك:\n\n{user_message}\n\n"
-        "قريبًا سأبحث لك عن أفضل الأسعار."
-    )
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "أنت مساعد ذكي عربي اسمه ميزان."
+                        " تساعد المستخدمين في الإجابة على الأسئلة"
+                        " والبحث عن المعلومات بطريقة احترافية."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": user_message,
+                },
+            ],
+        )
+
+        reply = response.choices[0].message.content
+
+        await update.message.reply_text(reply)
+
+    except Exception as e:
+        await update.message.reply_text(f"❌ حدث خطأ:\n{e}")
 
 
 def main():
@@ -41,9 +70,11 @@ def main():
     app = Application.builder().token(TOKEN).build()
 
     app.add_handler(CommandHandler("start", start))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    app.add_handler(
+        MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message)
+    )
 
-    print("MeezanBot Started...")
+    print("🤖 MeezanBot Started...")
 
     app.run_polling()
 
