@@ -2,47 +2,51 @@ import os
 import logging
 from telegram import Update
 from telegram.ext import (
-Application,
-CommandHandler,
-MessageHandler,
-ContextTypes,
-filters,
+    Application,
+    CommandHandler,
+    MessageHandler,
+    ContextTypes,
+    filters,
 )
 
 logging.basicConfig(
-format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
 )
 
 TOKEN = os.getenv("BOT_TOKEN")
 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-await update.message.reply_text(
-"👋 أهلاً بك في ميزان.\n\n"
-"أنا مساعدك الذكي لمقارنة الأسعار والعثور على أفضل العروض.\n\n"
-"اكتب اسم أي منتج وسأساعدك في العثور على أفضل خيار."
-)
+    await update.message.reply_text(
+        "👋 أهلاً بك في ميزان.\n\n"
+        "أنا مساعدك الذكي لمقارنة الأسعار والعثور على أفضل العروض.\n\n"
+        "اكتب اسم أي منتج وسأساعدك في العثور على أفضل خيار."
+    )
+
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-user_message = update.message.text
+    user_message = update.message.text
 
-await update.message.reply_text(  
-    f"🔍 استلمت طلبك:\n\n{user_message}\n\n"  
-    "قريبًا سأبحث لك عن أفضل الأسعار."  
-)
+    await update.message.reply_text(
+        f"🔍 استلمت طلبك:\n\n{user_message}\n\n"
+        "قريبًا سأبحث لك عن أفضل الأسعار."
+    )
+
 
 def main():
-if not TOKEN:
-raise ValueError("BOT_TOKEN environment variable not found")
+    if not TOKEN:
+        raise ValueError("BOT_TOKEN environment variable not found")
 
-app = Application.builder().token(TOKEN).build()  
+    app = Application.builder().token(TOKEN).build()
 
-app.add_handler(CommandHandler("start", start))  
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))  
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
 
-print("MeezanBot Started...")  
+    print("MeezanBot Started...")
 
-app.run_polling()
+    app.run_polling()
 
-if name == "main":
-main()
+
+if __name__ == "__main__":
+    main()
